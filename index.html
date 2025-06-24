@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毕业典礼签到系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: var(--secondary);
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .option-card {
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .option-card i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+        
+        .admin-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .password-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .badge-category {
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        .btn-export {
+            background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+            border: none;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+            border: none;
+        }
+        
+        .nav-tabs .nav-link {
+            font-weight: 500;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+            border-color: var(--primary);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stats-label {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #34495e 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px;
+        }
+        
+        .table th {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主页面 -->
+    <div id="main-page">
+        <div class="header py-4 mb-5 text-center">
+            <div class="container">
+                <h1 class="display-5 fw-bold"><i class="fas fa-graduation-cap me-3"></i>毕业典礼签到系统</h1>
+                <p class="lead">请选择您的签到类型</p>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="row g-4">
+                <!-- 班级代表 -->
+                <div class="col-md-4">
+                    <div class="card option-card text-center py-4" data-type="classRepresentative">
+                        <div class="card-body">
+                            <i class="fas fa-users"></i>
+                            <h3 class="card-title">班级代表</h3>
+                            <p class="card-text">班级负责人签到</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 节目成员 -->
+                <div class="col-md-4">
+                    <div class="card option-card text-center py-4" data-type="programMember">
+                        <div class="card-body">
+                            <i class="fas fa-music"></i>
+                            <h3 class="card-title">节目成员</h3>
+                            <p class="card-text">演出人员签到</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 优秀毕业生代表 -->
+                <div class="col-md-4">
+                    <div class="card option-card text-center py-4" data-type="outstandingGraduate">
+                        <div class="card-body">
+                            <i class="fas fa-award"></i>
+                            <h3 class="card-title">优秀毕业生代表</h3>
+                            <p class="card-text">优秀毕业生签到</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 签到表单 -->
+    <div id="signin-form" class="container mt-5" style="display: none;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-container">
+                    <button id="back-to-options" class="btn btn-outline-secondary mb-4">
+                        <i class="fas fa-arrow-left me-2"></i>返回
+                    </button>
+                    
+                    <h3 class="text-center mb-4" id="form-title">签到表单</h3>
+                    
+                    <form id="signin-data-form">
+                        <!-- 动态表单内容 -->
+                        <div id="form-content"></div>
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">提交签到</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理后台 -->
+    <div id="admin-panel" class="container mt-5" style="display: none;">
+        <div class="admin-header text-center mb-4">
+            <h2><i class="fas fa-lock me-2"></i>管理后台</h2>
+            <p class="mb-0">签到数据管理</p>
+        </div>
+        
+        <div class="admin-panel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <button id="back-to-main" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>返回主页面
+                    </button>
+                </div>
+                
+                <div>
+                    <button id="export-data" class="btn btn-export text-white me-2">
+                        <i class="fas fa-file-export me-2"></i>导出数据
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 数据统计 -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="class-rep-count">0</div>
+                        <div class="stats-label">班级代表</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="program-count">0</div>
+                        <div class="stats-label">节目成员</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="graduate-count">0</div>
+                        <div class="stats-label">优秀毕业生</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分类导航 -->
+            <ul class="nav nav-tabs mb-4" id="categoryTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">全部</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="class-tab" data-bs-toggle="tab" data-bs-target="#class" type="button" role="tab">班级代表</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="program-tab" data-bs-toggle="tab" data-bs-target="#program" type="button" role="tab">节目成员</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="graduate-tab" data-bs-toggle="tab" data-bs-target="#graduate" type="button" role="tab">优秀毕业生</button>
+                </li>
+            </ul>
+            
+            <!-- 数据表格 -->
+            <div class="tab-content" id="categoryTabContent">
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>班级/系部</th>
+                                    <th>姓名</th>
+                                    <th>班主任/负责人</th>
+                                    <th>节目名称</th>
+                                    <th>人员到齐</th>
+                                    <th>签到时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-data">
+                                <!-- 数据通过JS动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="class" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>班级</th>
+                                    <th>姓名</th>
+                                    <th>班主任</th>
+                                    <th>签到时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="class-data">
+                                <!-- 数据通过JS动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="program" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>系部</th>
+                                    <th>节目名称</th>
+                                    <th>负责人</th>
+                                    <th>人员到齐</th>
+                                    <th>签到时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="program-data">
+                                <!-- 数据通过JS动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="graduate" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>班级</th>
+                                    <th>姓名</th>
+                                    <th>班主任</th>
+                                    <th>签到时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="graduate-data">
+                                <!-- 数据通过JS动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 密码输入 -->
+    <div id="password-container" class="container mt-5" style="display: none;">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="password-container text-center">
+                    <h3 class="mb-4"><i class="fas fa-lock me-2"></i>管理员登录</h3>
+                    <div class="mb-3">
+                        <label for="admin-password" class="form-label">请输入管理密码</label>
+                        <input type="password" class="form-control form-control-lg" id="admin-password" placeholder="密码">
+                    </div>
+                    <button id="login-admin" class="btn btn-primary btn-lg w-100">进入管理后台</button>
+                    <button id="back-to-main-from-pwd" class="btn btn-outline-secondary mt-3 w-100">
+                        <i class="fas fa-arrow-left me-2"></i>返回主页面
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理入口按钮 -->
+    <button id="admin-btn" class="floating-btn btn btn-warning text-white">
+        <i class="fas fa-cog"></i>
+    </button>
+    
+    <!-- Toast通知 -->
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 页面元素
+        const mainPage = document.getElementById('main-page');
+        const signinForm = document.getElementById('signin-form');
+        const adminPanel = document.getElementById('admin-panel');
+        const passwordContainer = document.getElementById('password-container');
+        const adminBtn = document.getElementById('admin-btn');
+        const formContent = document.getElementById('form-content');
+        const formTitle = document.getElementById('form-title');
+        const signinFormElement = document.getElementById('signin-data-form');
+        const toastEl = document.querySelector('.toast');
+        const toastBody = document.querySelector('.toast-body');
+        const toast = new bootstrap.Toast(toastEl, {delay: 3000});
+        
+        // 数据存储键
+        const STORAGE_KEY = 'graduation_signin_data';
+        
+        // 当前选中的签到类型
+        let currentSigninType = '';
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', showSigninForm);
+            });
+            
+            document.getElementById('back-to-options').addEventListener('click', () => {
+                signinForm.style.display = 'none';
+                mainPage.style.display = 'block';
+            });
+            
+            document.getElementById('back-to-main').addEventListener('click', () => {
+                adminPanel.style.display = 'none';
+                mainPage.style.display = 'block';
+            });
+            
+            document.getElementById('back-to-main-from-pwd').addEventListener('click', () => {
+                passwordContainer.style.display = 'none';
+                mainPage.style.display = 'block';
+            });
+            
+            adminBtn.addEventListener('click', () => {
+                mainPage.style.display = 'none';
+                signinForm.style.display = 'none';
+                adminPanel.style.display = 'none';
+                passwordContainer.style.display = 'block';
+            });
+            
+            document.getElementById('login-admin').addEventListener('click', () => {
+                const password = document.getElementById('admin-password').value;
+                if (password === 'qcsgz') {
+                    passwordContainer.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    loadAdminData();
+                } else {
+                    showToast('密码错误，请重试', 'danger');
+                }
+            });
+            
+            signinFormElement.addEventListener('submit', handleFormSubmit);
+            
+            // 绑定导出按钮事件
+            document.getElementById('export-data').addEventListener('click', exportData);
+        });
+        
+        // 显示签到表单
+        function showSigninForm(e) {
+            currentSigninType = e.currentTarget.dataset.type;
+            mainPage.style.display = 'none';
+            signinForm.style.display = 'block';
+            
+            // 清空表单内容
+            formContent.innerHTML = '';
+            
+            // 根据类型生成表单
+            switch(currentSigninType) {
+                case 'classRepresentative':
+                    formTitle.textContent = '班级代表签到';
+                    generateClassRepForm();
+                    break;
+                case 'programMember':
+                    formTitle.textContent = '节目成员签到';
+                    generateProgramMemberForm();
+                    break;
+                case 'outstandingGraduate':
+                    formTitle.textContent = '优秀毕业生代表签到';
+                    generateGraduateForm();
+                    break;
+            }
+        }
+        
+        // 生成班级代表表单
+        function generateClassRepForm() {
+            formContent.innerHTML = `
+                <div class="mb-3">
+                    <label for="className" class="form-label">班级全称</label>
+                    <input type="text" class="form-control" id="className" placeholder="例如：20电子信息工程技术1班" required>
+                </div>
+                <div class="mb-3">
+                    <label for="repName" class="form-label">代表姓名</label>
+                    <input type="text" class="form-control" id="repName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="teacherName" class="form-label">班主任姓名</label>
+                    <input type="text" class="form-control" id="teacherName" required>
+                </div>
+            `;
+        }
+        
+        // 生成节目成员表单
+        function generateProgramMemberForm() {
+            formContent.innerHTML = `
+                <div class="mb-3">
+                    <label for="department" class="form-label">所属系部</label>
+                    <input type="text" class="form-control" id="department" placeholder="例如：电子工程系" required>
+                </div>
+                <div class="mb-3">
+                    <label for="programName" class="form-label">节目名称</label>
+                    <input type="text" class="form-control" id="programName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="leaderName" class="form-label">主要负责人姓名</label>
+                    <input type="text" class="form-control" id="leaderName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">人员是否到齐</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="allPresent" id="allPresentYes" value="yes" checked>
+                            <label class="form-check-label" for="allPresentYes">是</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="allPresent" id="allPresentNo" value="no">
+                            <label class="form-check-label" for="allPresentNo">否</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 生成优秀毕业生表单
+        function generateGraduateForm() {
+            formContent.innerHTML = `
+                <div class="mb-3">
+                    <label for="gradClassName" class="form-label">班级全称</label>
+                    <input type="text" class="form-control" id="gradClassName" placeholder="例如：20电子信息工程技术1班" required>
+                </div>
+                <div class="mb-3">
+                    <label for="gradName" class="form-label">代表姓名</label>
+                    <input type="text" class="form-control" id="gradName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="gradTeacherName" class="form-label">班主任姓名</label>
+                    <input type="text" class="form-control" id="gradTeacherName" required>
+                </div>
+            `;
+        }
+        
+        // 处理表单提交
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            let formData = {
+                type: currentSigninType,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            switch(currentSigninType) {
+                case 'classRepresentative':
+                    formData.className = document.getElementById('className').value;
+                    formData.repName = document.getElementById('repName').value;
+                    formData.teacherName = document.getElementById('teacherName').value;
+                    break;
+                case 'programMember':
+                    formData.department = document.getElementById('department').value;
+                    formData.programName = document.getElementById('programName').value;
+                    formData.leaderName = document.getElementById('leaderName').value;
+                    formData.allPresent = document.querySelector('input[name="allPresent"]:checked').value;
+                    break;
+                case 'outstandingGraduate':
+                    formData.className = document.getElementById('gradClassName').value;
+                    formData.repName = document.getElementById('gradName').value;
+                    formData.teacherName = document.getElementById('gradTeacherName').value;
+                    break;
+            }
+            
+            saveSigninData(formData);
+            signinFormElement.reset();
+            showToast('签到信息提交成功！', 'success');
+            
+            // 3秒后返回主页面
+            setTimeout(() => {
+                signinForm.style.display = 'none';
+                mainPage.style.display = 'block';
+            }, 1500);
+        }
+        
+        // 保存签到数据
+        function saveSigninData(data) {
+            let allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            allData.push(data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+        }
+        
+        // 加载管理后台数据
+        function loadAdminData() {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            // 更新统计数字
+            const classRepCount = allData.filter(d => d.type === 'classRepresentative').length;
+            const programCount = allData.filter(d => d.type === 'programMember').length;
+            const graduateCount = allData.filter(d => d.type === 'outstandingGraduate').length;
+            
+            document.getElementById('class-rep-count').textContent = classRepCount;
+            document.getElementById('program-count').textContent = programCount;
+            document.getElementById('graduate-count').textContent = graduateCount;
+            
+            // 渲染所有数据表
+            renderAllDataTable(allData);
+            
+            // 渲染分类数据表
+            renderClassRepTable(allData.filter(d => d.type === 'classRepresentative'));
+            renderProgramTable(allData.filter(d => d.type === 'programMember'));
+            renderGraduateTable(allData.filter(d => d.type === 'outstandingGraduate'));
+        }
+        
+        // 渲染所有数据表
+        function renderAllDataTable(data) {
+            const tbody = document.getElementById('all-data');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                let typeBadge = '';
+                if (item.type === 'classRepresentative') {
+                    typeBadge = '<span class="badge bg-primary badge-category">班级代表</span>';
+                } else if (item.type === 'programMember') {
+                    typeBadge = '<span class="badge bg-warning badge-category">节目成员</span>';
+                } else {
+                    typeBadge = '<span class="badge bg-success badge-category">优秀毕业生</span>';
+                }
+                
+                row.innerHTML = `
+                    <td>${typeBadge}</td>
+                    <td>${item.className || item.department || '-'}</td>
+                    <td>${item.repName || item.leaderName || '-'}</td>
+                    <td>${item.teacherName || '-'}</td>
+                    <td>${item.programName || '-'}</td>
+                    <td>${item.allPresent ? (item.allPresent === 'yes' ? '是' : '否') : '-'}</td>
+                    <td>${item.timestamp}</td>
+                    <td>
+                        <button class="btn btn-sm btn-delete text-white" data-index="${index}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('#all-data .btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteRecord);
+            });
+        }
+        
+        // 渲染班级代表表
+        function renderClassRepTable(data) {
+            const tbody = document.getElementById('class-data');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.className}</td>
+                    <td>${item.repName}</td>
+                    <td>${item.teacherName}</td>
+                    <td>${item.timestamp}</td>
+                    <td>
+                        <button class="btn btn-sm btn-delete text-white" data-index="${index}" data-type="classRepresentative">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('#class-data .btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteRecord);
+            });
+        }
+        
+        // 渲染节目成员表
+        function renderProgramTable(data) {
+            const tbody = document.getElementById('program-data');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.department}</td>
+                    <td>${item.programName}</td>
+                    <td>${item.leaderName}</td>
+                    <td>${item.allPresent === 'yes' ? '是' : '否'}</td>
+                    <td>${item.timestamp}</td>
+                    <td>
+                        <button class="btn btn-sm btn-delete text-white" data-index="${index}" data-type="programMember">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('#program-data .btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteRecord);
+            });
+        }
+        
+        // 渲染优秀毕业生表
+        function renderGraduateTable(data) {
+            const tbody = document.getElementById('graduate-data');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.className}</td>
+                    <td>${item.repName}</td>
+                    <td>${item.teacherName}</td>
+                    <td>${item.timestamp}</td>
+                    <td>
+                        <button class="btn btn-sm btn-delete text-white" data-index="${index}" data-type="outstandingGraduate">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('#graduate-data .btn-delete').forEach(btn => {
+                btn.addEventListener('click', deleteRecord);
+            });
+        }
+        
+        // 删除记录
+        function deleteRecord(e) {
+            const index = parseInt(e.currentTarget.dataset.index);
+            const specificType = e.currentTarget.dataset.type;
+            
+            let allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            // 如果是从分类表中删除，需要找到该类型中的记录在总数据中的位置
+            if (specificType) {
+                const typeData = allData.filter(d => d.type === specificType);
+                const itemToDelete = typeData[index];
+                const globalIndex = allData.findIndex(d => 
+                    d.type === itemToDelete.type && 
+                    d.timestamp === itemToDelete.timestamp
+                );
+                
+                if (globalIndex !== -1) {
+                    allData.splice(globalIndex, 1);
+                }
+            } else {
+                // 从总表中删除
+                allData.splice(index, 1);
+            }
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+            showToast('记录已删除', 'success');
+            loadAdminData(); // 重新加载数据
+        }
+        
+        // 导出数据
+        function exportData() {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            if (data.length === 0) {
+                showToast('没有可导出的数据', 'warning');
+                return;
+            }
+            
+            // 创建CSV内容
+            let csvContent = "类型,班级/系部,姓名,班主任/负责人,节目名称,人员到齐,签到时间\n";
+            
+            data.forEach(item => {
+                const row = [
+                    getTypeName(item.type),
+                    item.className || item.department || '',
+                    item.repName || item.leaderName || '',
+                    item.teacherName || '',
+                    item.programName || '',
+                    item.allPresent ? (item.allPresent === 'yes' ? '是' : '否') : '',
+                    item.timestamp
+                ];
+                
+                csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+            });
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `毕业典礼签到数据_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('数据导出成功', 'success');
+        }
+        
+        // 获取类型名称
+        function getTypeName(type) {
+            switch(type) {
+                case 'classRepresentative': return '班级代表';
+                case 'programMember': return '节目成员';
+                case 'outstandingGraduate': return '优秀毕业生';
+                default: return type;
+            }
+        }
+        
+        // 显示Toast通知
+        function showToast(message, type) {
+            toastBody.textContent = message;
+            toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+            
+            if (type === 'success') {
+                toastEl.classList.add('bg-success');
+            } else if (type === 'danger') {
+                toastEl.classList.add('bg-danger');
+            } else if (type === 'warning') {
+                toastEl.classList.add('bg-warning');
+            }
+            
+            toast.show();
+        }
+    </script>
+</body>
+</html>
